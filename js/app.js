@@ -14,81 +14,68 @@
 */
 
 
-/**
- * Define Global Variables
- * 
-*/
-let sectionList = document.getElementsByTagName('section');
+// Create the list of sections
+
+const sectionList = document.getElementsByTagName('section');
+
 
 // Build the dynamic navigation menu
 
 const ul = document.getElementById('navbar__list');
-for (let i = 0; i < sectionList.length; i++) {
-    const navSectionName = sectionList[i].getAttribute('data-nav'); // store the menu item name, for example "Section 1"
-    const navID = sectionList[i].getAttribute('id');  // store the id of the menu item, for example "section1"
+for (section of sectionList) {
+    const navSectionName = section.getAttribute('data-nav'); // store the menu item name, for example "Section 1"
+    const navID = section.getAttribute('id');  // store the id of the menu item, for example "section1"
     const liItem = document.createElement('li'); // create the new list element li
-    liItem.classList.add('navbar__menu'); // add the class value to the newly created li element
+    liItem.classList.add('menu__link'); // add the class value to the newly created li element
     liItem.setAttribute('data-section', navID); // add the data attribute to be able to access the menu item later
-    liItem.innerHTML = `<a class = 'menu__link' href='#${navID}'>${navSectionName}</a>`; // populate the li element with its HTML code
+    liItem.innerHTML = `<a href='#${navID}'>${navSectionName}</a>`; // populate the li element with its HTML code
     ul.appendChild(liItem); // append the newly created li element to its parent element ul
     
 };
 
-//Remove the active class if was active and set to active for the currently viewed section
-//by iterating through the sectionList elements
+// Create the list of menu items
 
-function changeToActive(parameter) {
-    for (let j = 0; j < sectionList.length; j++) {
-        sectionList[j].classList.remove('your-active-class'); // first remove the active class from all sections
+const menuItemList = document.getElementsByTagName('li'); 
+
+//Remove the active class if it was active and set to active for the currently viewed section and respective navigation menu
+//by iterating through the sectionList elements and menuItemList elements
+
+function changeToActive(parameter) {    // parameter will be a string like 'section1', which is the id of a section and the 'data-section' attribute of a navigation item
+    for (const section of sectionList) {
+        section.classList.remove('your-active-class'); // first remove the active class from all sections
     }
+    for (const menuItem of menuItemList) {
+        menuItem.classList.remove('active'); //remove the active class from all menu items
+    }        
+    
     document.getElementById(parameter).classList.add('your-active-class');  // set the active class for the currently viewed section
-    const menuItem = document.querySelector(`[data-section='${parameter}']`);
-    console.log(`The active menu item is ${parameter}`);
-    menuItem.classList.add("active");
+    const menuItem = document.querySelector(`[data-section='${parameter}']`); // find the respective menu item for the section in view
+    menuItem.classList.add("active"); // add the active class to the menu item
 }
-
-// Set the event listener to a click on the navigation bar in order to change the active status of the respective section
-
-document.getElementById('navbar__list').addEventListener('click', function(e) {
-    changeToActive(e.target.hash.substring(1)); // change the status for the section based on its id parameter
-});
-
 
 // Add class 'active' to the section and the navigation item when the section is near top of viewport
 
 function makeActiveOnScroll() { 
     for (const section of sectionList) {
-        const rectSection = section.getBoundingClientRect();        
-        if (rectSection.top <= 150 && rectSection.bottom >=150) {
-            changeToActive(section.id)
-        }
-        // if (rectSection.top <= 150 && rectSection.bottom >= 150) {            
-        //     section.classList.add('your-active-class') 
-        //     // const navItem = document.getElementById(section.class)// Apply active state on the current section and the corresponding Nav link. 
-        // } else {             
-        // //     //if (navItem.classList.contains('active')) {
-        // //     //    navItem.classList.remove('active')
-        // //     //  }
-        
-        //     if (section.classList.contains('your-active-class')) {
-        //         section.classList.remove('your-active-class')
-        //     } 
-        //} 
+        const rectSection = section.getBoundingClientRect();        // get the rectangle containing the section in view
+        if (rectSection.top <= 150 && rectSection.bottom >=150) {   // check if the rectangle is enough from the top and bottom of the screen to be active
+            changeToActive(section.id)  // call the function passing the string like 'section1' which is the id of the active section and the 'data-section' attribute of the active navigation item
+        }        
     }
 }
 
-//Make sections active 2
+// Make sections and menu items active on scroll
+
 document.addEventListener("scroll", function() { 
     makeActiveOnScroll(); 
 });
 
-//if (section is in the viewport) {
-    // 1. Add "your-active-class" to the current section
-    // 2. Add "active" class to the Nav link which have a class same as id of the current section
-//    } else {
-     // 1. Remove "your-active-class" from the current section.
- // 2. Remove "active" class from the Nav link which have a class same as id of current section
- //   }
+// Make sections and menu items active on click, the event listener is set on the parent navigation element
+
+document.getElementById('navbar__list').addEventListener('click', function(e) {
+    changeToActive(e.target.hash.substring(1)); // change the status of the section based on its id parameter
+});
+
 
 // Scroll smoothly to a section on a link click
 
